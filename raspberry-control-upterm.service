@@ -1,6 +1,6 @@
 
 [Unit]
-Description=Raspberry Control Upterm Remote Access
+Description=Raspberry Control Upterm Remote Terminal
 Wants=network-online.target
 After=network-online.target
 StartLimitIntervalSec=300
@@ -11,11 +11,17 @@ Type=simple
 User=raspberry-control
 Group=raspberry-control
 WorkingDirectory=/var/lib/raspberry-control
-EnvironmentFile=/etc/raspberry-control/upterm.env
-ExecStart=/usr/local/bin/upterm host --authorized-keys /etc/raspberry-control/authorized_keys
-Restart=on-failure
+Environment=HOME=/var/lib/raspberry-control
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+ExecStart=/usr/local/bin/upterm host --server wss://uptermd.upterm.dev --known-hosts /etc/raspberry-control/known_hosts --authorized-keys /etc/raspberry-control/authorized_keys --accept -- bash
+
+Restart=always
 RestartSec=10
 TimeoutStopSec=20
+KillSignal=SIGTERM
+UMask=0077
+
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
